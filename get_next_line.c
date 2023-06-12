@@ -6,7 +6,7 @@
 /*   By: mevangel <mevangel@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/07 14:18:34 by mevangel          #+#    #+#             */
-/*   Updated: 2023/06/12 16:17:41 by mevangel         ###   ########.fr       */
+/*   Updated: 2023/06/12 18:03:42 by mevangel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,28 @@ MAIN IDEA/LOGIC
 #include <unistd.h> //for the read function 
 #include "get_next_line.h"
 
+char	*ft_strjoin_alt(char *s1, char *s2)
+{
+	char	*new;
+	char	*cp_s1;
+	size_t	join_len;
+
+	cp_s1 = (char *)s1;
+	join_len = ft_strlen(s1) + ft_strlen(s2) + 1;
+	new = (char *)malloc(join_len);
+	if (new == NULL)
+		return (NULL);
+	ft_strlcpy(new, cp_s1, ft_strlen(cp_s1) + 1);
+	ft_strlcat(new, s2, join_len);
+	return (new);
+}
+
 char	ft_read_line(int fd, char *stash)
 {
 	int		read_bytes;
 	char	*buffer;
-	int		i;
-	
-	i = 0;
-	read_bytes = 0;
+
+	read_bytes = 1;
 	if (!stash) //to initialize stash for the first call since it's null initially
 	{
 		stash = (char *)malloc(1 * (sizeof(char)));
@@ -58,10 +72,14 @@ char	ft_read_line(int fd, char *stash)
 	{
 		read_bytes = read(fd, buffer, BUFFER_SIZE);
 		if (read_bytes = -1)
-			return (free(buffer), free(stash), NULL);
-		
-		
+		{
+			free(buffer);
+			return (NULL);
+		}
+		stash = ft_strjoin_alt(stash, buffer);
 	}
+	free(buffer);
+	return (stash);
 }
 
 char	*ft_restrict_line(char *str)
