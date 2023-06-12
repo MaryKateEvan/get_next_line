@@ -6,7 +6,7 @@
 /*   By: mevangel <mevangel@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/07 14:18:34 by mevangel          #+#    #+#             */
-/*   Updated: 2023/06/12 18:03:42 by mevangel         ###   ########.fr       */
+/*   Updated: 2023/06/12 19:08:57 by mevangel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,20 +38,39 @@ MAIN IDEA/LOGIC
 #include <unistd.h> //for the read function 
 #include "get_next_line.h"
 
+size_t	ft_length(char *str, char end)
+{
+	size_t	i;
+
+	i = 0;
+	while (str[i] != end)
+		i++;
+	return (i);
+}
+
 char	*ft_strjoin_alt(char *s1, char *s2)
 {
-	char	*new;
-	char	*cp_s1;
-	size_t	join_len;
+	char	*joined;
+	int		i;
+	int		j;
 
-	cp_s1 = (char *)s1;
-	join_len = ft_strlen(s1) + ft_strlen(s2) + 1;
-	new = (char *)malloc(join_len);
-	if (new == NULL)
+	if (!s1 || !s2)
+		return(NULL);
+	joined = (char *)malloc(ft_length(s1, '\0') + ft_length(s2, '\0') + 1);
+	if (!joined)
 		return (NULL);
-	ft_strlcpy(new, cp_s1, ft_strlen(cp_s1) + 1);
-	ft_strlcat(new, s2, join_len);
-	return (new);
+	i = 0;
+	j = 0;
+	while (s1[i++] != '\0')
+		joined[i] = s1[i];
+	while (s2[j++] != '\0')
+		joined[i + j] = s2[j];
+	joined[i + j] = '\0';
+	free(s1);
+	free(s2);
+	// ft_strlcpy(joined, cp_s1, ft_strlen(cp_s1) + 1);
+	// ft_strlcat(joined, s2, join_len);
+	return (joined);
 }
 
 char	ft_read_line(int fd, char *stash)
@@ -76,15 +95,31 @@ char	ft_read_line(int fd, char *stash)
 			free(buffer);
 			return (NULL);
 		}
+		buffer[read_bytes] = '\0';
 		stash = ft_strjoin_alt(stash, buffer);
 	}
-	free(buffer);
+	//free(buffer);
 	return (stash);
 }
 
 char	*ft_restrict_line(char *str)
 {
-	
+	char	*line;
+	int		i;
+
+	i = 0;
+	line = (char *)malloc(ft_length(str, '\n') + 2);
+	if (!line)
+		return(NULL);
+	while (str[i] && str[i] != '\n')
+		line[i++] = str[i++];
+	if (str[i] == '\n')
+	{
+		line[i] = str[i];
+		i++;
+	}
+	line[i] = '\0';
+	return(line);
 }
 
 char	*get_next_line(int fd)
