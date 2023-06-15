@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   gnl2nd.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mevangel <mevangel@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/07 14:18:34 by mevangel          #+#    #+#             */
-/*   Updated: 2023/06/15 21:13:10 by mevangel         ###   ########.fr       */
+/*   Updated: 2023/06/15 19:25:26 by mevangel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,6 @@
 
 #include "get_next_line.h"
 #include <unistd.h>
-#include <stdio.h>
-#include <fcntl.h>
 
 char	*ft_read_line(int fd, char *stash)
 {
@@ -45,19 +43,24 @@ char	*ft_read_line(int fd, char *stash)
 	char	*buffer;
 
 	read_bytes = 1;
+	if (!stash)
+	{
+		stash = (char *)malloc(1 * (sizeof(char)));
+		stash[0] = '\0';
+	}
 	buffer = (char *)malloc((BUFFER_SIZE + 1) * (sizeof(char)));
 	if (!buffer)
 		return (NULL);
-	while (!(ft_strchr(stash, '\n')) && read_bytes != 0)
+	while (!(ft_strchr(stash, '\n')) && read_bytes > 0)
 	{
 		read_bytes = read(fd, buffer, BUFFER_SIZE);
-		//printf("read_bytes is %d\n", read_bytes);
 		if (read_bytes == -1)
-			return (free(buffer), free(stash), NULL);
+		{
+			free(buffer);
+			return (NULL);
+		}
 		buffer[read_bytes] = '\0';
 		stash = ft_strjoin_alt(stash, buffer);
-		if (!stash)
-			return(free(buffer), NULL);
 	}
 	free(buffer);
 	return (stash);
@@ -69,25 +72,13 @@ char	*ft_restrict_line(char *str)
 	int		i;
 
 	i = 0;
-	if (str[0] == '\0')
-		return (NULL);
-	if ((ft_length(str, '\0') % BUFFER_SIZE) != 0)
-		line = (char *)malloc(ft_length(str, '\0') + 1);
-	else
-		line = (char *)malloc(ft_length(str, '\n') + 2);
-	//line = (char *)malloc(ft_length(str, '\n') + 2);
+	line = (char *)malloc(ft_length(str, '\n') + 2);
 	if (!line)
 		return (NULL);
-	while (str[i] != '\0' && str[i] != '\n')
-	{
+	while (str[i++] && str[i] != '\n')
 		line[i] = str[i];
-		i++;
-	}
-	if (str[i] == '\n')
-	{
+	if (str[i++] == '\n')
 		line[i] = str[i];
-		i++;
-	}
 	line[i] = '\0';
 	return (line);
 }
@@ -100,23 +91,15 @@ char	*ft_renew_stash(char *stash)
 
 	i = 0;
 	j = 0;
-	if (stash[i] == '\0')
-		return (NULL);
 	while (stash[i] != '\0' && stash[i] != '\n')
 		i++;
 	new = (char *)malloc((ft_length(stash, '\0') - i + 1) * sizeof(char));
 	if (!new)
 		return (NULL);
-	i++;
 	while (stash[i] != '\0')
-	{
-		new[j] = stash[i];
-		j++;
-		i++;
-	}
+		new[j++] = stash[i++];
 	new[j] = '\0';
 	free(stash);
-	//printf("test\n");
 	return (new);
 }
 
@@ -134,37 +117,6 @@ char	*get_next_line(int fd)
 	stash = ft_renew_stash(stash);
 	return (line);
 }
-
-int    main(void)
-{
-    char    *line;
-    int        i;
-    int        fd1;
-    int        fd2;
-    int        fd3;
-    fd1 = open("test.txt", O_RDONLY);
-    fd2 = open("test2.txt", O_RDONLY);
-    fd3 = open("test3.txt", O_RDONLY);
-    i = 1;
-    while (i < 2)
-    {
-        line = get_next_line(fd1);
-        printf("line [%02d]: %s", i, line);
-        free(line);
-        // line = get_next_line(fd2);
-        // printf("line [%02d]: %s", i, line);
-        // free(line);
-        // line = get_next_line(fd3);
-        // printf("line [%02d]: %s", i, line);
-        // free(line);
-        i++;
-    }
-    close(fd1);
-    close(fd2);
-    close(fd3);
-    return (0);
-}
-
 
 /*
 what my get_next_line must return:

@@ -6,7 +6,7 @@
 /*   By: mevangel <mevangel@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/07 14:18:34 by mevangel          #+#    #+#             */
-/*   Updated: 2023/06/15 21:13:10 by mevangel         ###   ########.fr       */
+/*   Updated: 2023/06/15 20:19:04 by mevangel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,11 +53,12 @@ char	*ft_read_line(int fd, char *stash)
 		read_bytes = read(fd, buffer, BUFFER_SIZE);
 		//printf("read_bytes is %d\n", read_bytes);
 		if (read_bytes == -1)
-			return (free(buffer), free(stash), NULL);
+		{
+			free(buffer);
+			return (NULL);
+		}
 		buffer[read_bytes] = '\0';
 		stash = ft_strjoin_alt(stash, buffer);
-		if (!stash)
-			return(free(buffer), NULL);
 	}
 	free(buffer);
 	return (stash);
@@ -69,8 +70,6 @@ char	*ft_restrict_line(char *str)
 	int		i;
 
 	i = 0;
-	if (str[0] == '\0')
-		return (NULL);
 	if ((ft_length(str, '\0') % BUFFER_SIZE) != 0)
 		line = (char *)malloc(ft_length(str, '\0') + 1);
 	else
@@ -89,6 +88,7 @@ char	*ft_restrict_line(char *str)
 		i++;
 	}
 	line[i] = '\0';
+	printf("test_in_restrict_line\n");
 	return (line);
 }
 
@@ -100,8 +100,6 @@ char	*ft_renew_stash(char *stash)
 
 	i = 0;
 	j = 0;
-	if (stash[i] == '\0')
-		return (NULL);
 	while (stash[i] != '\0' && stash[i] != '\n')
 		i++;
 	new = (char *)malloc((ft_length(stash, '\0') - i + 1) * sizeof(char));
@@ -135,35 +133,35 @@ char	*get_next_line(int fd)
 	return (line);
 }
 
-int    main(void)
-{
-    char    *line;
-    int        i;
-    int        fd1;
-    int        fd2;
-    int        fd3;
-    fd1 = open("test.txt", O_RDONLY);
-    fd2 = open("test2.txt", O_RDONLY);
-    fd3 = open("test3.txt", O_RDONLY);
-    i = 1;
-    while (i < 2)
-    {
-        line = get_next_line(fd1);
-        printf("line [%02d]: %s", i, line);
-        free(line);
-        // line = get_next_line(fd2);
-        // printf("line [%02d]: %s", i, line);
-        // free(line);
-        // line = get_next_line(fd3);
-        // printf("line [%02d]: %s", i, line);
-        // free(line);
-        i++;
-    }
-    close(fd1);
-    close(fd2);
-    close(fd3);
-    return (0);
-}
+// int    main(void)
+// {
+//     char    *line;
+//     int        i;
+//     int        fd1;
+//     int        fd2;
+//     int        fd3;
+//     fd1 = open("test.txt", O_RDONLY);
+//     fd2 = open("test2.txt", O_RDONLY);
+//     fd3 = open("test3.txt", O_RDONLY);
+//     i = 1;
+//     while (i < 10)
+//     {
+//         line = get_next_line(fd1);
+//         printf("line [%02d]: %s", i, line);
+//         free(line);
+//         // line = get_next_line(fd2);
+//         // printf("line [%02d]: %s", i, line);
+//         // free(line);
+//         // line = get_next_line(fd3);
+//         // printf("line [%02d]: %s", i, line);
+//         // free(line);
+//         i++;
+//     }
+//     close(fd1);
+//     close(fd2);
+//     close(fd3);
+//     return (0);
+// }
 
 
 /*
