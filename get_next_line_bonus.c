@@ -1,17 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mevangel <mevangel@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/07 14:18:34 by mevangel          #+#    #+#             */
-/*   Updated: 2023/06/17 19:22:05 by mevangel         ###   ########.fr       */
+/*   Updated: 2023/06/17 19:27:26 by mevangel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
-#include <unistd.h>
+#include "get_next_line_bonus.h"
 
 char	*ft_read_line(int fd, char *stash)
 {
@@ -92,15 +91,15 @@ char	*ft_renew_stash(char *stash)
 
 char	*get_next_line(int fd)
 {
-	static char	*stash;
+	static char	*stash[1024];
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	stash = ft_read_line(fd, stash);
-	if (!stash)
+	stash[fd] = ft_read_line(fd, stash[fd]);
+	if (!stash[fd])
 		return (NULL);
-	line = ft_restrict_line(stash);
-	stash = ft_renew_stash(stash);
+	line = ft_restrict_line(stash[fd]);
+	stash[fd] = ft_renew_stash(stash[fd]);
 	return (line);
 }
