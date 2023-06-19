@@ -6,11 +6,11 @@
 /*   By: mevangel <mevangel@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/07 14:18:30 by mevangel          #+#    #+#             */
-/*   Updated: 2023/06/17 19:14:41 by mevangel         ###   ########.fr       */
+/*   Updated: 2023/06/17 19:32:22 by mevangel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h" 
+#include "get_next_line.h"
 
 size_t	ft_strlen(char *str)
 {
