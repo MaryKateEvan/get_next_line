@@ -6,13 +6,13 @@
 /*   By: mevangel <mevangel@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/07 14:18:34 by mevangel          #+#    #+#             */
-/*   Updated: 2023/06/17 19:27:26 by mevangel         ###   ########.fr       */
+/*   Updated: 2023/06/19 18:09:09 by mevangel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line_bonus.h"
 
-char	*ft_read_line(int fd, char *stash)
+static char	*ft_collect_data(int fd, char *stash)
 {
 	int		read_bytes;
 	char	buffer[BUFFER_SIZE + 1];
@@ -24,48 +24,32 @@ char	*ft_read_line(int fd, char *stash)
 		if (read_bytes == -1)
 			return (free(stash), NULL);
 		buffer[read_bytes] = '\0';
-		if (!stash)
-		{
-			stash = (char *)malloc(1 * (sizeof(char)));
-			if (!stash)
-				return (NULL);
-			stash[0] = '\0';
-		}
-		stash = ft_strjoin_alt(stash, buffer);
-		if (!stash)
-			return (NULL);
+		stash = ft_strjoin(stash, buffer);
 	}
 	return (stash);
 }
 
-char	*ft_restrict_line(char *str)
+static char	*ft_restrict_line(char *stash)
 {
 	char	*line;
 	int		i;
 
 	i = 0;
-	if (str[0] == '\0')
+	if (stash[0] == '\0')
 		return (NULL);
-	while (str[i] != '\n' && str[i] != '\0')
+	while (stash[i] != '\n' && stash[i])
 		i++;
-	if (str[i] == '\n')
+	if (stash[i] == '\n')
 		i++;
-	line = (char *)malloc((i + 1) * sizeof(char));
+	line = ft_char_calloc(i + 1);
 	if (!line)
 		return (NULL);
-	i = -1;
-	while (str[++i] != '\0' && str[i] != '\n')
-		line[i] = str[i];
-	if (str[i] == '\n')
-	{
-		line[i] = str[i];
-		i++;
-	}
-	line[i] = '\0';
+	while (--i >= 0)
+		line[i] = stash[i];
 	return (line);
 }
 
-char	*ft_renew_stash(char *stash)
+static char	*ft_renew_stash(char *stash)
 {
 	char	*new;
 	int		i;
@@ -75,28 +59,33 @@ char	*ft_renew_stash(char *stash)
 	j = 0;
 	if (stash[i] == '\0')
 		return (free(stash), NULL);
-	while (stash[i] != '\0' && stash[i] != '\n')
+	while (stash[i] != '\n' && stash[i])
 		i++;
-	new = (char *)malloc((ft_strlen(stash) - i + 1) * sizeof(char));
+	new = ft_char_calloc(ft_strlen(stash) - i + 1);
 	if (!new)
 		return (free(stash), NULL);
 	if (stash[i] == '\n')
 		i++;
 	while (stash[i] != '\0')
 		new[j++] = stash[i++];
-	new[j] = '\0';
 	free(stash);
 	return (new);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*stash[1024];
+	static char	*stash[4096];
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	stash[fd] = ft_read_line(fd, stash[fd]);
+	if (stash[fd] == NULL)
+	{
+		stash[fd] = ft_char_calloc(1);
+		if (!stash[fd])
+			return (NULL);
+	}
+	stash[fd] = ft_collect_data(fd, stash[fd]);
 	if (!stash[fd])
 		return (NULL);
 	line = ft_restrict_line(stash[fd]);
